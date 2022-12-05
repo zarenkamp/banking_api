@@ -1,3 +1,9 @@
+### INFO 
+
+Running with ENV = 'local' will create a sqlite development database with prepolulated with example data.
+Documentation can then be found under localhost:5000/swagger.
+
+
 ### Objective
 
 Your assignment is to build an internal API for a fake financial institution using Python and any framework.
