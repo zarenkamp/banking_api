@@ -1,0 +1,235 @@
+swagger: "2.0"
+info:
+  title: Internal Banking API
+  description: | 
+               Simple banking api for internal use. 
+               Allows creation and deletion of customers. 
+               Banking accounts can be created and deleted but require a customer first.
+               Information about a specific account like balance can be retrieved under the /customer/{customer_id}/accounts/{account_number} endpoint.
+               Allows transfres from one account to another if covering is sufficient.
+               If multiple parameters are expected like **customer_id** and **account_number** make sure that the 
+               account belongs to this customer (this will be also chekced internally).
+               The existence of the customer is generally first checked. If both parameter are wrong the return message will only contain
+               information about the customer.
+  version: 1.0.0
+basePath: /api
+
+
+definitions:
+  Customer:
+    properties:
+      customer_id:
+        type: integer
+        readOnly: true
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+      - first_name
+      - last_name
+
+  Account:
+    properties:
+      account_number:
+        type: integer
+        readOnly: true
+      owner:
+        type: integer
+        readOnly: true
+      balance:
+        type: number
+    required:
+      - owner
+      - balance
+
+  Transfer:
+    properties:
+      transfer_id:
+        type: integer
+        readOnly: true
+      amount:
+        type: number
+        required: true
+      sending_customer:
+        type: integer
+        required: true
+      sending_account:
+        type: integer
+        required: true
+      receiving_customer:
+        type: integer
+        required: true
+      receiving_account:
+        type: integer
+        required: true
+    required:
+      - amount
+      - sending_customer
+      - sending_account
+      - receiving_customer
+      - receiving_account
+
+paths:
+  /customers:
+    get:
+      summary: Returns all customers
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Customer'
+    post:
+      summary: Creates new customer
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: customer
+          schema:
+            $ref: '#/definitions/Customer'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Customer'
+
+  /customers/{customer_id}:
+    get:
+      summary: Returns a specific customer by its customer_id
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Customer'
+    delete:
+      summary: Deletes customer by its customer_id
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Customer'
+
+  /customers/{customer_id}/accounts:
+    get:
+      summary: Returns all accounts of a specific customer
+      description: Information about account balance can be obtained here
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Account'
+    post:
+      summary: Creates new account for customer with customer_id
+      description: customer_id is taken from URL and must not be passed in body, thus only the initial balance must be passed
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+        - in: body
+          name: account
+          schema:
+            $ref: '#/definitions/Account'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Account'
+
+  /customers/{customer_id}/accounts/{account_number}:
+    get:
+      summary: Returns a specific account
+      description: Information about account balance can be obtained here, make sure that account_number fits to customer_id
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+        - in: path
+          name: account_number
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: Deletes account by account_number
+      description: Make sure that account_number fits to customer_id
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+        - in: path
+          name: account_number
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Account'
+
+  /customers/{customer_id}/accounts/{account_number}/history:
+    get:
+      summary: Returns transfer history
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          type: integer
+        - in: path
+          name: account_number
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+
+  /transfer:
+    post:
+      summary: Endpoint for making transfers from one account to another.
+      description: The customer_id of sending customer must be provided aswell as the account_number of the sending account.
+                   Same applies for receiving customer and account. Make sure that customer_id and account_number fit
+      parameters:
+        - in: body
+          name: transfer
+          schema:
+            $ref: '#/definitions/Transfer'
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
