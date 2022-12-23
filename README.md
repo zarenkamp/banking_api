@@ -1,9 +1,10 @@
 ### INFO 
+Coding challenge for an application November 22.
 
 Running with ENV = 'local' will create a sqlite development database with prepolulated with example data.
 Documentation can then be found under localhost:5000/swagger.
 
-
+######################################
 ### Objective
 
 Your assignment is to build an internal API for a fake financial institution using Python and any framework.
@@ -59,11 +60,3 @@ You are expected to design any other required models and routes for your API.
 - Maintainability: is it written in a clean, maintainable way?
 - Testing: is the system adequately tested?
 - Documentation: is the API well-documented?
-
-### CodeSubmit
-
-Please organize, design, test and document your code as if it were going into production - then push your changes to the master branch. After you have pushed your code, you may submit the assignment on the assignment page.
-
-All the best and happy coding,
-
-The Entrix Team
